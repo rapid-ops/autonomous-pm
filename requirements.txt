@@ -1,12 +1,12 @@
 fastapi
 uvicorn
-crewai==0.11.2
 langchain==0.1.20
 langchain-openai==0.0.5
 langchain-community==0.0.38
-openai
+openai==1.109.1
 apscheduler
 python-dotenv
 tzdata
-docstring-parser==0.18.0
 setuptools
+crewai==0.11.2
+docstring-parser>=0.15,<0.16

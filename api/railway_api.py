@@ -66,7 +66,7 @@ class MaintenanceRequest(BaseModel):
 
 @app.get("/")
 def root():
-    return FileResponse(os.path.join(os.path.dirname(__file__), "../static/index.html"))
+    return {"status": "Rapid Ops Gateway Running", "form": "coming soon"}
 
 @app.get("/health")
 def health():

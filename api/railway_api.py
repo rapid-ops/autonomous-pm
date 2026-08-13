@@ -1,17 +1,22 @@
 from fastapi import FastAPI
-from fastapi.staticfiles import StaticFiles
-from fastapi.responses import FileResponse
+from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 import sqlite3
 import os
-import json
 import requests
 from datetime import datetime
 
 app = FastAPI(title="Rapid Ops - Lead Gateway")
 
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
 DB_PATH = "/tmp/rapid_ops.db"
-PHONE_WEBHOOK = os.environ.get("PHONE_WEBHOOK_URL", "")
 
 def init_db():
     conn = sqlite3.connect(DB_PATH)
@@ -40,13 +45,6 @@ def init_db():
 
 init_db()
 
-def notify_phone(endpoint: str, data: dict):
-    if PHONE_WEBHOOK:
-        try:
-            requests.post(f"{PHONE_WEBHOOK}{endpoint}", json=data, timeout=5)
-        except Exception as e:
-            print(f"[webhook] Could not reach phone: {e}")
-
 class LeadForm(BaseModel):
     name: str
     email: str
@@ -66,7 +64,7 @@ class MaintenanceRequest(BaseModel):
 
 @app.get("/")
 def root():
-    return {"status": "Rapid Ops Gateway Running", "form": "coming soon"}
+    return {"status": "Rapid Ops Gateway Running"}
 
 @app.get("/health")
 def health():
@@ -82,7 +80,6 @@ def receive_lead(lead: LeadForm):
                lead.property_interest, datetime.now().isoformat()))
     conn.commit()
     conn.close()
-    notify_phone("/process-lead", lead.dict())
     return {"status": "received", "message": "Your inquiry has been received. We will respond within minutes."}
 
 @app.post("/tenant")
@@ -94,7 +91,6 @@ def receive_tenant(msg: TenantMessage):
               (msg.name, msg.unit, msg.message, datetime.now().isoformat()))
     conn.commit()
     conn.close()
-    notify_phone("/process-tenant", msg.dict())
     return {"status": "received"}
 
 @app.post("/maintenance")
@@ -106,7 +102,6 @@ def receive_maintenance(req: MaintenanceRequest):
               (req.name, req.unit, req.issue, datetime.now().isoformat()))
     conn.commit()
     conn.close()
-    notify_phone("/process-maintenance", req.dict())
     return {"status": "received"}
 
 @app.get("/leads")

@@ -1,13 +1,5 @@
 fastapi
 uvicorn
-langchain==0.1.20
-langchain-openai==0.0.5
-langchain-community==0.0.38
-openai==1.109.1
-apscheduler
 python-dotenv
 tzdata
-setuptools
-crewai==0.11.2
-docstring-parser>=0.15,<0.16
-tiktoken==0.5.2
+requests

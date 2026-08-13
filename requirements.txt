@@ -10,3 +10,4 @@ tzdata
 setuptools
 crewai==0.11.2
 docstring-parser>=0.15,<0.16
+tiktoken==0.5.2

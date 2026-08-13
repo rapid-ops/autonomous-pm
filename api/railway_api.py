@@ -117,3 +117,21 @@ def get_leads():
     rows = c.fetchall()
     conn.close()
     return {"leads": rows}
+
+@app.get("/leads/pending")
+def get_pending_leads():
+    conn = sqlite3.connect(DB_PATH)
+    c = conn.cursor()
+    c.execute("SELECT * FROM leads WHERE status = 'PENDING' ORDER BY created_at ASC")
+    rows = c.fetchall()
+    conn.close()
+    return {"leads": rows}
+
+@app.post("/leads/{lead_id}/processed")
+def mark_processed(lead_id: int):
+    conn = sqlite3.connect(DB_PATH)
+    c = conn.cursor()
+    c.execute("UPDATE leads SET status = 'PROCESSED' WHERE id = ?", (lead_id,))
+    conn.commit()
+    conn.close()
+    return {"status": "updated"}

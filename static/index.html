@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Property Inquiry — Rapid Ops</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Segoe UI', sans-serif;
+            background: #f4f6f9;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+        .container {
+            background: white;
+            border-radius: 12px;
+            padding: 40px;
+            width: 100%;
+            max-width: 500px;
+            box-shadow: 0 4px 24px rgba(0,0,0,0.08);
+        }
+        .logo {
+            font-size: 22px;
+            font-weight: 700;
+            color: #0d1b2a;
+            margin-bottom: 6px;
+        }
+        .tagline {
+            font-size: 13px;
+            color: #6b7280;
+            margin-bottom: 30px;
+        }
+        h2 {
+            font-size: 20px;
+            color: #0d1b2a;
+            margin-bottom: 24px;
+        }
+        .field {
+            margin-bottom: 18px;
+        }
+        label {
+            display: block;
+            font-size: 13px;
+            font-weight: 600;
+            color: #374151;
+            margin-bottom: 6px;
+        }
+        input, textarea, select {
+            width: 100%;
+            padding: 12px 14px;
+            border: 1.5px solid #e5e7eb;
+            border-radius: 8px;
+            font-size: 14px;
+            color: #111827;
+            outline: none;
+            transition: border 0.2s;
+            font-family: inherit;
+        }
+        input:focus, textarea:focus, select:focus {
+            border-color: #0d1b2a;
+        }
+        textarea { height: 100px; resize: none; }
+        button {
+            width: 100%;
+            padding: 14px;
+            background: #0d1b2a;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 15px;
+            font-weight: 600;
+            cursor: pointer;
+            margin-top: 8px;
+            transition: background 0.2s;
+        }
+        button:hover { background: #1a2f45; }
+        button:disabled { background: #9ca3af; cursor: not-allowed; }
+        .success {
+            display: none;
+            text-align: center;
+            padding: 30px 0;
+        }
+        .success h3 { color: #0d1b2a; font-size: 20px; margin-bottom: 10px; }
+        .success p { color: #6b7280; font-size: 14px; }
+        .checkmark {
+            font-size: 48px;
+            margin-bottom: 16px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="logo">Rapid Ops</div>
+        <div class="tagline">Property Operations, Automated.</div>
+
+        <div id="form-section">
+            <h2>Inquire About a Property</h2>
+            <div class="field">
+                <label>Full Name</label>
+                <input type="text" id="name" placeholder="John Smith" required>
+            </div>
+            <div class="field">
+                <label>Email Address</label>
+                <input type="email" id="email" placeholder="john@email.com" required>
+            </div>
+            <div class="field">
+                <label>Phone Number</label>
+                <input type="tel" id="phone" placeholder="+1 555 000 0000" required>
+            </div>
+            <div class="field">
+                <label>Property Interest</label>
+                <input type="text" id="property" placeholder="e.g. 2 bedroom unit, Apt 3B">
+            </div>
+            <div class="field">
+                <label>Your Message</label>
+                <textarea id="message" placeholder="Tell us about yourself and what you are looking for..."></textarea>
+            </div>
+            <button id="submit-btn" onclick="submitForm()">Send Inquiry</button>
+        </div>
+
+        <div class="success" id="success-section">
+            <div class="checkmark">✓</div>
+            <h3>Inquiry Received</h3>
+            <p>Thank you. We will get back to you within minutes.</p>
+        </div>
+    </div>
+
+    <script>
+        async function submitForm() {
+            const btn = document.getElementById('submit-btn');
+            const name = document.getElementById('name').value.trim();
+            const email = document.getElementById('email').value.trim();
+            const phone = document.getElementById('phone').value.trim();
+            const property = document.getElementById('property').value.trim();
+            const message = document.getElementById('message').value.trim();
+
+            if (!name || !email || !phone || !message) {
+                alert('Please fill in all required fields.');
+                return;
+            }
+
+            btn.disabled = true;
+            btn.textContent = 'Sending...';
+
+            try {
+                const response = await fetch('/lead', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        name, email, phone, message,
+                        property_interest: property
+                    })
+                });
+
+                if (response.ok) {
+                    document.getElementById('form-section').style.display = 'none';
+                    document.getElementById('success-section').style.display = 'block';
+                } else {
+                    alert('Something went wrong. Please try again.');
+                    btn.disabled = false;
+                    btn.textContent = 'Send Inquiry';
+                }
+            } catch (err) {
+                alert('Connection error. Please try again.');
+                btn.disabled = false;
+                btn.textContent = 'Send Inquiry';
+            }
+        }
+    </script>
+</body>
+</html>
